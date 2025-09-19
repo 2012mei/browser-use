@@ -46,7 +46,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            browseruse/browseruse
+            lamminh2012/browseruse
             ghcr.io/browser-use/browser-use
           tags: |
             type=ref,event=branch
