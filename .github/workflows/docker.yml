@@ -20,7 +20,7 @@ jobs:
       id-token: write
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -65,5 +65,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=browseruse/browseruse:buildcache
-          cache-to: type=registry,ref=browseruse/browseruse:buildcache,mode=max
+          cache-from: type=registry,ref=lamminh2012/browseruse:buildcache
+          cache-to: type=registry,ref=lamminh2012/browseruse:buildcache,mode=max
