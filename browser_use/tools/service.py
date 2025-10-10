@@ -249,6 +249,9 @@ class Tools(Generic[Context]):
 				if node is None:
 					raise ValueError(f'Element index {params.index} not found in browser state')
 
+				# Highlight the element being clicked (async, non-blocking)
+				await browser_session.highlight_interaction_element(node)
+
 				event = browser_session.event_bus.dispatch(ClickElementEvent(node=node, while_holding_ctrl=params.ctrl or False))
 				await event
 				# Wait for handler to complete and get any exception or metadata
@@ -301,6 +304,9 @@ class Tools(Generic[Context]):
 			node = await browser_session.get_element_by_index(params.index)
 			if node is None:
 				raise ValueError(f'Element index {params.index} not found in browser state')
+
+			# Highlight the element being typed into (async, non-blocking)
+			await browser_session.highlight_interaction_element(node)
 
 			# Dispatch type text event with node
 			try:
@@ -445,6 +451,10 @@ class Tools(Generic[Context]):
 			# Try to find a file input element near the selected element
 			file_input_node = find_file_input_near_element(node)
 
+			# Highlight the file input element if found
+			if file_input_node:
+				await browser_session.highlight_interaction_element(file_input_node)
+
 			# If not found near the selected element, fallback to finding the closest file input to current scroll position
 			if file_input_node is None:
 				logger.info(
@@ -478,6 +488,8 @@ class Tools(Generic[Context]):
 				if closest_file_input:
 					file_input_node = closest_file_input
 					logger.info(f'Found file input closest to scroll position (distance: {min_distance}px)')
+					# Highlight the fallback file input element
+					await browser_session.highlight_interaction_element(file_input_node)
 				else:
 					msg = 'No file upload element found on the page'
 					logger.error(msg)
@@ -819,7 +831,9 @@ You will be given a query and the markdown of a webpage that has been filtered t
 					long_term_memory=f"Tried scrolling to text '{text}' but it was not found",
 				)
 
-		@self.registry.action('')
+		@self.registry.action(
+			'Request screenshot of current viewport. Use when: visual inspection needed, layout unclear, element positions uncertain, debugging UI issues, or verifying page state. Screenshot included in next observation.',
+		)
 		async def screenshot():
 			"""Request that a screenshot be included in the next observation"""
 			memory = 'Requested screenshot for next observation'
